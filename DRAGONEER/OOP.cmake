@@ -47,16 +47,23 @@ function(ScanInterface classname)
             "// Generated class ${classname}\n\n"
             "typedef struct {\n"
             "   ${classname}_Vft vft;\n"
+            "   void *obj;\n"
             "} ${classname};\n\n"
+            "typedef ${classname}* ${classname}Ptr;\n\n"
             )
 
     foreach (f ${matches})
         scanMethod("${f}" temname temparam temret)
-        message(STATUS "Scanned: ${temname} ${temparam} ${temret}")
+
+        string(REGEX REPLACE "^${spaces}*\\(" "(${classname}Ptr self," temparam "${temparam}")
+        string(REGEX REPLACE "${anum}+[${spaces}*]*(${anum}+)" "\\1" passed "${temparam}")
+
+        message(STATUS "Scanned: ${temname} ${temparam} ${temret} ${passed}")
         file(APPEND
                 "${out_file}"
                 "${temret} ${classname}_${temname} ${temparam}"
                 " {\n"
+                "   self->vft->${temname}${passed};\n"
                 "}\n\n"
                 )
     endforeach ()
