@@ -5,8 +5,8 @@ struct Vft_ElemIList;
 typedef struct Vft_IList TVft_IListPtr;
 
 struct Vft_ElemIList {
-    TUnitPtrSize DgnMethod (* GetLength) ( TVft_IListPtr* list );
-    TUnitPtrSize DgnMethod (* GetLength2) ( TVft_IListPtr* list );
+    TUnitPtrSize DgnMethod (* GetLength) ( float a, float b );
+    TUnitPtrSize DgnMethod (* GetLength2) ( float b, float c );
 };
 
 #endif

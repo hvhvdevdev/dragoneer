@@ -45,4 +45,4 @@ target_compile_definitions(
 
 include(OOP.cmake)
 
-ScanInterface(IList.h)
+ScanInterface(IList)
