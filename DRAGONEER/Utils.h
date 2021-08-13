@@ -11,6 +11,6 @@ typedef uint32_t TUint32;
 typedef uint16_t TUint16;
 typedef uint8_t  TUint8;
 
-typedef uint8_t* TString;
+typedef const uint8_t* TCStrPtr;
 
 #endif //DRAGONEER_UTILS_H

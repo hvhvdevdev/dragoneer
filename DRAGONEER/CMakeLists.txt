@@ -27,17 +27,12 @@ add_library(
 )
 
 set_target_properties(${DRAGONEER_LIBRARY_NAME} PROPERTIES LINKER_LANGUAGE C)
+set_target_properties(${DRAGONEER_LIBRARY_NAME} PROPERTIES C_STANDARD 99)
+set_target_properties(${DRAGONEER_LIBRARY_NAME} PROPERTIES C_STANDARD_REQUIRED TRUE)
+set_target_properties(${DRAGONEER_LIBRARY_NAME} PROPERTIES C_EXTENSION OFF)
 
 target_include_directories(
         ${DRAGONEER_LIBRARY_NAME}
         PUBLIC
         ${CMAKE_CURRENT_BINARY_DIR}/${DRAGONEER_LIBRARY_NAME}/
-)
-
-
-target_compile_definitions(
-        ${DRAGONEER_LIBRARY_NAME}
-        PUBLIC
-        -DDgnPublic
-        -DDgnImpl
 )
