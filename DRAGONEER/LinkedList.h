@@ -1,27 +1,29 @@
-struct TElemLinkedListNode;
-typedef struct TElemLinkedListNode* PElemLinkedListNode;
+#include "Utils.h"
 
-struct TElemLinkedListNode {
-    TElem               value;
-    PElemLinkedListNode next;
+struct SElemLinkedListNode;
+typedef struct SElemLinkedListNode* TElemLinkedListNodePtr;
+
+struct SElemLinkedListNode {
+    TElem                  value;
+    TElemLinkedListNodePtr next;
 };
 
-struct TElemLinkedList {
-    TIntPtrSize         length;
-    PElemLinkedListNode first;
-    PElemLinkedListNode last;
+struct SElemLinkedList {
+    TIntPtrSize            length;
+    TElemLinkedListNodePtr first;
+    TElemLinkedListNodePtr last;
 };
 
-typedef struct TElemLinkedList* PElemLinkedListPtr;
+typedef struct SElemLinkedList* TElemLinkedListPtr;
 
-static void ElemLinkedList_GetLength ( PElemLinkedListPtr list ) {
+static inline void ElemLinkedList_GetLength ( TElemLinkedListPtr list ) {
     return list->length;
 }
 
-static void ElemLinkedList_PeakFirst ( PElemLinkedListPtr list ) {
+static inline void ElemLinkedList_PeakFirst ( TElemLinkedListPtr list ) {
     return list->first->value;
 }
 
-static void ElemLinkedList_PeakLast ( PElemLinkedListPtr list ) {
+static inline void ElemLinkedList_PeakLast ( TElemLinkedListPtr list ) {
     return list->last->value;
 }

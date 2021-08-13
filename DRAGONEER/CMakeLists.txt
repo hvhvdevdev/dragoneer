@@ -18,10 +18,26 @@ foreach (file ${DRAGONEER_INPUTS})
     )
 endforeach ()
 
-add_library(${DRAGONEER_LIBRARY_NAME} INTERFACE)
+add_library(
+        ${DRAGONEER_LIBRARY_NAME}
+        Dummy.c
+        IList.h
+        Utils.h
+        ${DRAGONEER_INPUTS}
+)
+
+set_target_properties(${DRAGONEER_LIBRARY_NAME} PROPERTIES LINKER_LANGUAGE C)
 
 target_include_directories(
         ${DRAGONEER_LIBRARY_NAME}
-        INTERFACE
+        PUBLIC
         ${CMAKE_CURRENT_BINARY_DIR}/${DRAGONEER_LIBRARY_NAME}/
+)
+
+
+target_compile_definitions(
+        ${DRAGONEER_LIBRARY_NAME}
+        PUBLIC
+        -DDgnPublic
+        -DDgnImpl
 )
