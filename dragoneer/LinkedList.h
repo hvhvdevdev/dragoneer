@@ -1,29 +1,26 @@
+#ifndef LINKEDLIST_H_Elem
+#define LINKEDLIST_H_Elem
+
 #include "Utils.h"
+#include <OOP/ImplIElemList.h>
 
-struct SElemLinkedListNode;
-typedef struct SElemLinkedListNode* TElemLinkedListNodePtr;
+struct ElemLinkedListNode;
+typedef struct ElemLinkedListNode *TElemLinkedListNodePtr;
 
-struct SElemLinkedListNode {
-    TElem                  value;
+struct ElemLinkedListNode {
+    Elem                   value;
     TElemLinkedListNodePtr next;
 };
 
-struct SElemLinkedList {
-    TIntPtrSize            length;
+struct ElemLinkedList {
     TElemLinkedListNodePtr first;
     TElemLinkedListNodePtr last;
+    TUintPtrSize           length;
+    IElemList              asList;
 };
 
-typedef struct SElemLinkedList* TElemLinkedListPtr;
+typedef struct ElemLinkedList *ElemLinkedListPtr;
 
-static inline void ElemLinkedList_GetLength ( TElemLinkedListPtr list ) {
-    return list->length;
-}
+struct ElemLinkedList *ElemLinkedList_Create ();
 
-static inline void ElemLinkedList_PeakFirst ( TElemLinkedListPtr list ) {
-    return list->first->value;
-}
-
-static inline void ElemLinkedList_PeakLast ( TElemLinkedListPtr list ) {
-    return list->last->value;
-}
+#endif

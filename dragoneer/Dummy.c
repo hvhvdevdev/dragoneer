@@ -1,2 +1,5 @@
+typedef float Elem;
+
 #include "Utils.h"
-#include "ImplIList.h"
+#include "IElemList.h"
+#include "LinkedList.h"

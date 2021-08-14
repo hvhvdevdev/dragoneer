@@ -5,21 +5,65 @@ project(DRAGONEER
 
 set(DRAGONEER_LIBRARY_NAME "Dragoneer")
 
-set(DRAGONEER_INPUTS "LinkedList.h")
+set(DRAGONEER_INPUTS LinkedList.h IElemList.h LinkedList.c)
 
-foreach (file ${DRAGONEER_INPUTS})
-    message("${file}")
-    configure_file(
-            "${CMAKE_CURRENT_SOURCE_DIR}/${file}"
-            "${CMAKE_CURRENT_BINARY_DIR}/${DRAGONEER_LIBRARY_NAME}/${file}"
-            @ONLY
-    )
+set(DRAGONEER_INTERFACES IElemList)
+
+set(DRAGONEER_CONCRETES LinkedList.h LinkedList.c)
+
+set(Concrete_Path ${CMAKE_CURRENT_SOURCE_DIR})
+
+function(EnableGeneric tgt)
+    foreach (inter ${DRAGONEER_INTERFACES})
+        ScanInterface(${inter})
+        set(impath "${CMAKE_CURRENT_BINARY_DIR}/${DRAGONEER_LIBRARY_NAME}/OOP/Impl${inter}.h")
+        file(READ ${impath} txt)
+        file(WRITE ${impath} "// ${ARGN}\n\n")
+        foreach (type ${ARGN})
+            string(REPLACE "Elem" "${type}" cont "${txt}")
+            file(APPEND ${impath} "${cont}")
+        endforeach ()
+    endforeach ()
+
+
+    foreach (con ${DRAGONEER_CONCRETES})
+        set(cpath "${CMAKE_CURRENT_BINARY_DIR}/${DRAGONEER_LIBRARY_NAME}/OOP/${con}")
+        file(READ "${Concrete_Path}/${con}" txt)
+        file(WRITE ${cpath} "// ${ARGN} \n\n")
+        foreach (type ${ARGN})
+            string(REGEX REPLACE "Elem" "${type}" cont "${txt}")
+            string(REGEX REPLACE "/ImplI${type}" "/ImplIElem" cont "${cont}")
+            file(APPEND ${cpath} "\n\n${cont}")
+        endforeach ()
+    endforeach ()
+
+    configure_file(${Concrete_Path}/Utils.h ${CMAKE_CURRENT_BINARY_DIR}/${DRAGONEER_LIBRARY_NAME}/OOP/Utils.h)
+
+    target_include_directories(${tgt} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/${DRAGONEER_LIBRARY_NAME}/OOP)
+    target_include_directories(${tgt} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/${DRAGONEER_LIBRARY_NAME}/)
+
+    set(srcs ${DRAGONEER_CONCRETES})
+
+    list(TRANSFORM srcs PREPEND "${CMAKE_CURRENT_BINARY_DIR}/${DRAGONEER_LIBRARY_NAME}/OOP/")
+
+    message("${srcs}")
+
+    #    add_library("${tgt}__dragon" ${srcs})
+
+    #    target_link_libraries(${tgt} ${tgt}__dragon)
+
+    target_sources(${tgt} PRIVATE ${srcs})
+endfunction()
+
+
+foreach (inp ${DRAGONEER_INPUTS})
+    configure_file(${inp} "${DRAGONEER_LIBRARY_NAME}/${inp}" @ONLY)
 endforeach ()
 
 add_library(
         ${DRAGONEER_LIBRARY_NAME}
         Dummy.c
-        IList.h
+        IElemList.h
         Utils.h
         ${DRAGONEER_INPUTS}
 )
@@ -48,7 +92,7 @@ target_compile_definitions(
 
 include(OOP.cmake)
 
-ScanInterface(IList)
+EnableGeneric(${DRAGONEER_LIBRARY_NAME} TInt32 TFloat Elem)
 
 # Add examples
 

@@ -10,7 +10,8 @@ struct CDog {
     TUint8   age;
     // Type casters
     IAnimal  asIAnimal;
-}Implement_IAnimal( CDog );
+};
+Implement_IAnimal( CDog );
 
 struct CCat {
     // Member data
@@ -18,7 +19,8 @@ struct CCat {
     TUint8   age;
     // Type casters
     IAnimal  asIAnimal;
-}Implement_IAnimal( CCat );
+};
+Implement_IAnimal( CCat );
 
 void CDog_Intro ( TVoidPtr _self, TCStrPtr message ) {
     struct CDog *self = _self;

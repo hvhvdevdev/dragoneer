@@ -21,6 +21,8 @@ function(scanMethod inp out_name out_param out_ret)
     set(${out_ret} "${rettype}" PARENT_SCOPE)
 endfunction()
 
+set(Interface_Dir ${CMAKE_CURRENT_SOURCE_DIR})
+
 function(ScanInterface classname)
     message(STATUS "Scanning ${file_name}")
     set(file_name "${classname}.h")
@@ -28,7 +30,13 @@ function(ScanInterface classname)
     # Setting output files name
     set(out_file "${CMAKE_CURRENT_BINARY_DIR}/${DRAGONEER_LIBRARY_NAME}/OOP/Impl${file_name}")
     message("${out_file}")
-    file(READ ${file_name} txt)
+    message(STATUS "  ${CMAKE_CURRENT_SOURCE_DIR}   ~~~~~ ${Interface_Dir}")
+    if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${file_name}")
+        file(READ ${file_name} txt)
+    else ()
+        file(READ "${Interface_Dir}/${file_name}" txt)
+        set(file_name "${Interface_Dir}/${file_name}")
+    endif ()
 
     # Does not make any sense but fix various stuffs.
     configure_file(
@@ -50,6 +58,8 @@ function(ScanInterface classname)
     file(WRITE
             "${out_file}"
             "// Generated class ${classname}\n"
+            "#ifndef H_GUARD_${classname}\n"
+            "#define H_GUARD_${classname}\n\n"
             "struct ${classname}_Vft;\n\n"
             "typedef struct ${classname}_Vft* ${classname}_VftPtr;\n\n"
             "typedef struct {\n"
@@ -76,17 +86,19 @@ function(ScanInterface classname)
 
     file(APPEND
             "${out_file}"
-            "#define Implement_${classname}(c) ;\\\n"
+            "#define Implement_${classname}(c) \\\n"
             )
 
     foreach (f ${matches})
         scanMethod("${f}" temname temparam temret)
 
         string(REGEX REPLACE "^${spaces}*\\(" "(TVoidPtr self," temparam "${temparam}")
+        string(REGEX REPLACE ",\\)" ")" temparam "${temparam}")
         string(REGEX REPLACE "${anum}+[${spaces}*]*(${anum}+)" "\\1" passed "${temparam}")
+        string(REGEX REPLACE ",\\)" ")" passed "${passed}")
         string(REGEX REPLACE "self" "self->obj" passed "${passed}")
 
-        #message(STATUS "Scanned: ${temname} ${temparam} ${temret} ${passed}")
+        message(STATUS "Scanned: ${temname} ${temparam} ${temret} ${passed}")
         file(APPEND
                 "${out_file}"
                 "${temret} c##_${temname} ${temparam};\\\n"
@@ -104,6 +116,7 @@ function(ScanInterface classname)
         scanMethod("${f}" temname temparam temret)
 
         string(REGEX REPLACE "^${spaces}*\\(" "(TVoidPtr self," temparam "${temparam}")
+        string(REGEX REPLACE ",\\)" ")" temparam "${temparam}")
         string(REGEX REPLACE "${anum}+[${spaces}*]*(${anum}+)" "\\1" passed "${temparam}")
         string(REGEX REPLACE "self" "self->obj" passed "${passed}")
 
@@ -130,6 +143,7 @@ function(ScanInterface classname)
         scanMethod("${f}" temname temparam temret)
 
         string(REGEX REPLACE "^${spaces}*\\(" "(TVoidPtr self," temparam "${temparam}")
+        string(REGEX REPLACE ",\\)" ")" temparam "${temparam}")
         string(REGEX REPLACE "${anum}+[${spaces}*]*(${anum}+)" "\\1" passed "${temparam}")
         string(REGEX REPLACE "self" "self->obj" passed "${passed}")
 
@@ -161,6 +175,7 @@ function(ScanInterface classname)
         scanMethod("${f}" temname temparam temret)
 
         string(REGEX REPLACE "^${spaces}*\\(" "(${classname}Ptr self," temparam "${temparam}")
+        string(REGEX REPLACE ",\\)" ")" temparam "${temparam}")
         string(REGEX REPLACE "const|\\[\\]" "" passed "${temparam}")
         #message(STATUS "DEBUG BEFORE: ${passed}")
         string(REGEX REPLACE "((${anum})+)${spaces}*(([*]+))" "\\1 " passed "${passed}")
@@ -195,6 +210,10 @@ function(ScanInterface classname)
                 "}\n\n"
                 )
     endforeach ()
+    file(APPEND
+            "${out_file}"
+            "#endif"
+            )
 endfunction()
 
 function(EnableOOP target)
