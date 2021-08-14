@@ -76,7 +76,7 @@ function(ScanInterface classname)
 
     file(APPEND
             "${out_file}"
-            "#define Implement_${classname}(c) \\\n"
+            "#define Implement_${classname}(c) ;\\\n"
             )
 
     foreach (f ${matches})
