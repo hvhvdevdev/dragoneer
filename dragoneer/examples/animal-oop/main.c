@@ -54,8 +54,8 @@ IAnimal CDog_Create ( TCStrPtr name ) {
 
 int main ( int argc, char **args ) {
     IAnimal animal;
-    animal = CCat_Create( "Tom" );
-    IAnimal_Intro( &animal, "Meow~ " );//
-    animal = CDog_Create( "Spike" );
-    IAnimal_Intro( &animal, "Woof woof~ " );//
+    animal = CCat_Create(( TCStrPtr ) "Tom" );
+    IAnimal_Intro( &animal, ( TCStrPtr ) "Meow~ " );
+    animal = CDog_Create(( TCStrPtr ) "Spike" );
+    IAnimal_Intro( &animal, ( TCStrPtr ) "Woof woof~ " );
 }
