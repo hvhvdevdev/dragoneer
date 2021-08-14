@@ -1,5 +1,6 @@
 #include <Utils.h>
 #include <ImplIAnimal.h>
+#include <ImplIMammal.h>
 #include <stdio.h>
 #include <malloc.h>
 

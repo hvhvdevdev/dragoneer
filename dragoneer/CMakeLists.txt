@@ -26,7 +26,7 @@ add_library(
 
 configure_file(Utils.h "${CMAKE_CURRENT_BINARY_DIR}/${DRAGONEER_LIBRARY_NAME}/Utils.h" @ONLY)
 
-set_target_properties(${DRAGONEER_LIBRARY_NAME} PROPERTIES LINKER_LANGUAGE C)
+#set_target_properties(${DRAGONEER_LIBRARY_NAME} PROPERTIES LINKER_LANGUAGE C)
 set_target_properties(${DRAGONEER_LIBRARY_NAME} PROPERTIES C_EXTENSIONS OFF)
 set_target_properties(${DRAGONEER_LIBRARY_NAME} PROPERTIES C_STANDARD 99)
 set_target_properties(${DRAGONEER_LIBRARY_NAME} PROPERTIES C_STANDARD_REQUIRED TRUE)
@@ -41,6 +41,7 @@ target_compile_definitions(
         ${DRAGONEER_LIBRARY_NAME}
         PUBLIC
         DgnMethod=
+        DgnInherit=//
 )
 
 # OOP

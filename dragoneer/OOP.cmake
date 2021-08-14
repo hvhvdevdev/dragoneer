@@ -4,17 +4,17 @@ function(scanMethod inp out_name out_param out_ret)
     set(anum "[A-Za-z0-9]")
 
     string(REGEX MATCH "(${anum})+(${spaces}|[*])+" rettype "${temp}")
-    message(STATUS "return ${rettype}")
+    #message(STATUS "return ${rettype}")
 
-    message(STATUS "Input: ${temp}")
+    #message(STATUS "Input: ${temp}")
     string(REGEX REPLACE "${anum}+(${spaces}|[*])+DgnMethod${spaces}+" "" temp "${temp}")
-    message(STATUS "Temp: ${temp}")
+    #message(STATUS "Temp: ${temp}")
     string(REGEX MATCH "${anum}+" methname "${temp}")
-    message(STATUS "methname: ${methname}")
+    #message(STATUS "methname: ${methname}")
 
     string(REGEX REPLACE "\\(\\*[^\\)]*\\)" "" params "${temp}")
     string(REGEX REPLACE ".*DgnMethod" "" params "${params}")
-    message(STATUS "Params: ${params}")
+    #message(STATUS "Params: ${params}")
 
     set(${out_name} "${methname}" PARENT_SCOPE)
     set(${out_param} "${params}" PARENT_SCOPE)
@@ -42,6 +42,9 @@ function(ScanInterface classname)
     set(anum "[A-Za-z0-9]")
     string(REGEX MATCHALL "(${anum}|[* ])+${spaces}*DgnMethod${spaces}+[^;]+;" matches "${txt}")
 
+    # Scan for inheritance
+    string(REGEX MATCHALL "DgnInherit${spaces}+${anum}+;" inherits "${txt}")
+    message("${inherits}")
 
     # Write implementation helper
     file(WRITE
@@ -52,6 +55,18 @@ function(ScanInterface classname)
             "typedef struct {\n"
             "   ${classname}_VftPtr pVft;\n"
             "   TVoidPtr obj;\n"
+            )
+    #foreach (inh ${inherits})
+    #    string(REGEX REPLACE "(DgnInherit)| " "" inh "${inh}")
+    #    string(REGEX REPLACE "(DgnInherit)| " "" inh "${inh}")
+    #
+    #       file(APPEND
+    #              "${out_file}"
+    #             "  ${inh}_VftPtr p${inh}_Vft;\n"
+    #            )
+    #endforeach ()
+    file(APPEND
+            "${out_file}"
             "} ${classname};\n\n"
             "typedef ${classname}* ${classname}Ptr;\n\n"
             )
@@ -71,7 +86,7 @@ function(ScanInterface classname)
         string(REGEX REPLACE "${anum}+[${spaces}*]*(${anum}+)" "\\1" passed "${temparam}")
         string(REGEX REPLACE "self" "self->obj" passed "${passed}")
 
-        message(STATUS "Scanned: ${temname} ${temparam} ${temret} ${passed}")
+        #message(STATUS "Scanned: ${temname} ${temparam} ${temret} ${passed}")
         file(APPEND
                 "${out_file}"
                 "${temret} c##_${temname} ${temparam};\\\n"
@@ -92,7 +107,7 @@ function(ScanInterface classname)
         string(REGEX REPLACE "${anum}+[${spaces}*]*(${anum}+)" "\\1" passed "${temparam}")
         string(REGEX REPLACE "self" "self->obj" passed "${passed}")
 
-        message(STATUS "Scanned: ${temname} ${temparam} ${temret} ${passed}")
+        #message(STATUS "Scanned: ${temname} ${temparam} ${temret} ${passed}")
         file(APPEND
                 "${out_file}"
                 "   .${temname} = c##_${temname} ,\\\n"
@@ -118,10 +133,21 @@ function(ScanInterface classname)
         string(REGEX REPLACE "${anum}+[${spaces}*]*(${anum}+)" "\\1" passed "${temparam}")
         string(REGEX REPLACE "self" "self->obj" passed "${passed}")
 
-        message(STATUS "Scanned: ${temname} ${temparam} ${temret} ${passed}")
+        # message(STATUS "Scanned: ${temname} ${temparam} ${temret} ${passed}")
         file(APPEND
                 "${out_file}"
                 "   ${temret} (*${temname}) ${temparam};\n"
+                )
+    endforeach ()
+
+
+    foreach (inh ${inherits})
+        string(REGEX REPLACE "(DgnInherit)| " "" inh "${inh}")
+        string(REGEX REPLACE "(DgnInherit)| " "" inh "${inh}")
+
+        file(APPEND
+                "${out_file}"
+                "  ${inh}_VftPtr p${inh}_Vft;\n"
                 )
     endforeach ()
 
@@ -136,19 +162,36 @@ function(ScanInterface classname)
 
         string(REGEX REPLACE "^${spaces}*\\(" "(${classname}Ptr self," temparam "${temparam}")
         string(REGEX REPLACE "const|\\[\\]" "" passed "${temparam}")
-        message(STATUS "DEBUG BEFORE: ${passed}")
+        #message(STATUS "DEBUG BEFORE: ${passed}")
         string(REGEX REPLACE "((${anum})+)${spaces}*(([*]+))" "\\1 " passed "${passed}")
-        message(STATUS "DEBUG: ${passed}")
+        #message(STATUS "DEBUG: ${passed}")
         string(REGEX REPLACE "(${anum}|[*])+[${spaces}]*(${anum}+)" "\\2" passed "${passed}")
-        message(STATUS "DEBUG: ${passed}")
+        #message(STATUS "DEBUG: ${passed}")
         string(REGEX REPLACE "self" "self->obj" passed "${passed}")
 
-        message(STATUS "Scanned: ${temname} ${temparam} ${temret} ${passed}")
+        #message(STATUS "Scanned: ${temname} ${temparam} ${temret} ${passed}")
         file(APPEND
                 "${out_file}"
                 "static ${temret} ${classname}_${temname} ${temparam}"
                 " {\n"
                 "   return self->pVft->${temname}${passed};\n"
+                "}\n\n"
+                )
+    endforeach ()
+
+    # Cast function
+
+    foreach (inh ${inherits})
+        string(REGEX REPLACE "(DgnInherit)| " "" inh "${inh}")
+        string(REGEX REPLACE "(DgnInherit)| " "" inh "${inh}")
+
+        file(APPEND
+                "${out_file}"
+                "static ${inh} ${classname}_As_${inh} (${classname} original) {\n"
+                "   ${inh} temp;\n"
+                "   temp.pVft = (original.pVft)->p${inh}_Vft;\n"
+                "   temp.obj = original.obj;\n"
+                "   return temp;\n"
                 "}\n\n"
                 )
     endforeach ()
