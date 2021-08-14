@@ -7,11 +7,13 @@
 struct CDog {
     TCStrPtr name;
     TUint8   age;
+    IAnimal  asIAnimal;
 };
 
 struct CCat {
     TCStrPtr name;
     TUint8   age;
+    IAnimal  asIAnimal;
 };
 
 Implement_IAnimal( CDog );
@@ -27,36 +29,28 @@ void CCat_Intro ( TVoidPtr _self, TCStrPtr message ) {
     printf( "Cat said: %s %s\n", message, self->name );
 }
 
-TUint8 CDog_GetAge ( TVoidPtr _self, TUint8 maxAge ) {
-    struct CDog *self = _self;
-    return self->age;
-}
-
-TUint8 CCat_GetAge ( TVoidPtr _self, TUint8 maxAge ) {
-    struct CCat *self = _self;
-    return self->age;
-}
-
-IAnimal CCat_Create ( TCStrPtr name ) {
+struct CCat *CCat_Create ( TCStrPtr name ) {
     struct CCat *data = malloc( sizeof( struct CCat ));
     data->name = name;
     data->age  = 1;
-    IAnimal animal = { .obj = data, .pVft = &CCat_IAnimal_Vft };
-    return animal;
+    IAnimal asIAnimal = { .pVft = &CCat_IAnimal_Vft, .obj = data };
+    data->asIAnimal = asIAnimal;
+    return data;
 }
 
-IAnimal CDog_Create ( TCStrPtr name ) {
+struct CDog *CDog_Create ( TCStrPtr name ) {
     struct CDog *data = malloc( sizeof( struct CDog ));
     data->name = name;
     data->age  = 1;
-    IAnimal animal = { .obj = data, .pVft = &CDog_IAnimal_Vft };
-    return animal;
+    IAnimal asIAnimal = { .pVft = &CDog_IAnimal_Vft, .obj = data };
+    data->asIAnimal = asIAnimal;
+    return data;
 }
 
 int main ( int argc, char **args ) {
     IAnimal animal;
-    animal = CCat_Create(( TCStrPtr ) "Tom" );
+    animal = CCat_Create(( TCStrPtr ) "Tom" )->asIAnimal;
     IAnimal_Intro( &animal, ( TCStrPtr ) "Meow~ " );
-    animal = CDog_Create(( TCStrPtr ) "Spike" );
+    animal = CDog_Create(( TCStrPtr ) "Spike" )->asIAnimal;
     IAnimal_Intro( &animal, ( TCStrPtr ) "Woof woof~ " );
 }
