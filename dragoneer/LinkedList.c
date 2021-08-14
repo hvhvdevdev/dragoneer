@@ -98,8 +98,7 @@ TBool ElemLinkedList_InsertAt ( TVoidPtr _self, TUintPtrSize index, Elem item ) 
     toInsert->next  = NULL;
     if ( self->first == NULL) {
         if ( index == 0 ) {
-            ElemLinkedList_Append( self, item );
-            return true;
+            return ElemLinkedList_Append( self, item );
         } else {
             return false;
         }
@@ -121,9 +120,63 @@ TBool ElemLinkedList_InsertAt ( TVoidPtr _self, TUintPtrSize index, Elem item ) 
     self->length++;
     return true;
 }
-//
-//
-//
-//TBool DgnMethod (*DelFirst) ();
-//TBool DgnMethod (*DelLast) ();
-//TBool DgnMethod (*DelNth) ();
+
+TBool ElemLinkedList_DelFirst ( TVoidPtr _self ) {
+    ElemLinkedListPtr self = _self;
+    if ( self->first == NULL) {
+        return false;
+    }
+    if ( self->first == self->last ) {
+        free( self->first );
+        self->first  = NULL;
+        self->last   = NULL;
+        self->length = 0;
+        return true;
+    }
+    TElemLinkedListNodePtr temp = self->first->next;
+    free( self->first );
+    self->first = temp;
+    self->length--;
+    return true;
+}
+
+TBool ElemLinkedList_DelLast ( TVoidPtr _self ) {
+    ElemLinkedListPtr self = _self;
+    if ( self->first == NULL) {
+        return false;
+    }
+    if ( self->first == self->last ) {
+        free( self->first );
+        self->first  = NULL;
+        self->last   = NULL;
+        self->length = 0;
+        return true;
+    }
+    return ElemLinkedList_DelNth( self, self->length - 1 );
+}
+
+TBool ElemLinkedList_DelNth ( TVoidPtr _self, TUintPtrSize index ) {
+    ElemLinkedListPtr self = _self;
+    if ( index == 0 ) {
+        return ElemLinkedList_DelFirst( self );
+    }
+    TElemLinkedListNodePtr ptr = self->first;
+    while ( index > 2 ) {
+        if ( ptr->next == NULL) {
+            return false;
+        }
+        ptr = ptr->next;
+        index--;
+    }
+    if ( ptr->next == NULL) {
+        return false;
+    }
+    TElemLinkedListNodePtr temp = ptr->next->next;
+    free( ptr->next );
+    ptr->next = temp;
+    if ( ptr->next == NULL) {
+        self->last = ptr;
+    }
+    self->length--;
+    return true;
+}

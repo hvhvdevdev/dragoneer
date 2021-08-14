@@ -5,3 +5,6 @@ Elem DgnMethod (*GetLast) ();
 Elem DgnMethod (*GetNth) ( TUintPtrSize index );
 TBool DgnMethod (*Prepend) ( Elem item );
 TBool DgnMethod (*InsertAt) ( TUintPtrSize index, Elem item );
+TBool DgnMethod (*DelFirst) ();
+TBool DgnMethod (*DelLast) ();
+TBool DgnMethod (*DelNth) ( TUintPtrSize index );
