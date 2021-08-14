@@ -26,7 +26,7 @@ function(ScanInterface classname)
     set(file_name "${classname}.h")
 
     # Setting output files name
-    set(out_file "${CMAKE_CURRENT_BINARY_DIR}/${DRAGONEER_LIBRARY_NAME}/Impl${file_name}")
+    set(out_file "${CMAKE_CURRENT_BINARY_DIR}/${DRAGONEER_LIBRARY_NAME}/OOP/Impl${file_name}")
     message("${out_file}")
     file(READ ${file_name} txt)
 
@@ -61,8 +61,29 @@ function(ScanInterface classname)
 
     file(APPEND
             "${out_file}"
-            "#define Implement_${classname}(c) { \\\n"
+            "#define Implement_${classname}(c) \\\n"
             )
+
+    foreach (f ${matches})
+        scanMethod("${f}" temname temparam temret)
+
+        string(REGEX REPLACE "^${spaces}*\\(" "(TVoidPtr self," temparam "${temparam}")
+        string(REGEX REPLACE "${anum}+[${spaces}*]*(${anum}+)" "\\1" passed "${temparam}")
+        string(REGEX REPLACE "self" "self->obj" passed "${passed}")
+
+        message(STATUS "Scanned: ${temname} ${temparam} ${temret} ${passed}")
+        file(APPEND
+                "${out_file}"
+                "${temret} c##_${temname} ${temparam};\\\n"
+                )
+    endforeach ()
+
+
+    file(APPEND
+            "${out_file}"
+            "   struct ${classname}_Vft c##_##${classname}_Vft = { \\\n"
+            )
+
 
     foreach (f ${matches})
         scanMethod("${f}" temname temparam temret)
@@ -77,6 +98,7 @@ function(ScanInterface classname)
                 "   .${temname} = c##_${temname} ,\\\n"
                 )
     endforeach ()
+
     file(APPEND
             "${out_file}"
             "    }\\\n"
@@ -117,7 +139,8 @@ function(ScanInterface classname)
         message(STATUS "DEBUG BEFORE: ${passed}")
         string(REGEX REPLACE "((${anum})+)${spaces}*(([*]+))" "\\1 " passed "${passed}")
         message(STATUS "DEBUG: ${passed}")
-        string(REGEX REPLACE "(${anum}|[*])+[${spaces}*]*(${anum}+)" "\\2" passed "${passed}")
+        string(REGEX REPLACE "(${anum}|[*])+[${spaces}]*(${anum}+)" "\\2" passed "${passed}")
+        message(STATUS "DEBUG: ${passed}")
         string(REGEX REPLACE "self" "self->obj" passed "${passed}")
 
         message(STATUS "Scanned: ${temname} ${temparam} ${temret} ${passed}")
@@ -129,4 +152,8 @@ function(ScanInterface classname)
                 "}\n\n"
                 )
     endforeach ()
+endfunction()
+
+function(EnableOOP target)
+    target_include_directories(${target} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/${DRAGONEER_LIBRARY_NAME}/OOP)
 endfunction()
