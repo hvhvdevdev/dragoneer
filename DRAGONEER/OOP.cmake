@@ -3,10 +3,11 @@ function(scanMethod inp out_name out_param out_ret)
     set(spaces "[ \\r\\t\\n]")
     set(anum "[A-Za-z0-9]")
 
-    string(REGEX MATCH "(${anum}|[ *])+" rettype "${temp}")
+    string(REGEX MATCH "(${anum})+(${spaces}|[*])+" rettype "${temp}")
+    message(STATUS "return ${rettype}")
 
     message(STATUS "Input: ${temp}")
-    string(REGEX REPLACE "${anum}+${spaces}+DgnMethod${spaces}+" "" temp "${temp}")
+    string(REGEX REPLACE "${anum}+(${spaces}|[*])+DgnMethod${spaces}+" "" temp "${temp}")
     message(STATUS "Temp: ${temp}")
     string(REGEX MATCH "${anum}+" methname "${temp}")
     message(STATUS "methname: ${methname}")
@@ -39,7 +40,7 @@ function(ScanInterface classname)
     # Scan for methods
     set(spaces "[ \\r\\t\\n]")
     set(anum "[A-Za-z0-9]")
-    string(REGEX MATCHALL "(${anum}|[*])+${spaces}*DgnMethod${spaces}+[^;]+;" matches "${txt}")
+    string(REGEX MATCHALL "(${anum}|[* ])+${spaces}*DgnMethod${spaces}+[^;]+;" matches "${txt}")
 
 
     # Write implementation helper
@@ -84,13 +85,17 @@ function(ScanInterface classname)
         scanMethod("${f}" temname temparam temret)
 
         string(REGEX REPLACE "^${spaces}*\\(" "(${classname}Ptr self," temparam "${temparam}")
-        string(REGEX REPLACE "${anum}+[${spaces}*]*(${anum}+)" "\\1" passed "${temparam}")
+        string(REGEX REPLACE "const|\\[\\]" "" passed "${temparam}")
+        message(STATUS "DEBUG BEFORE: ${passed}")
+        string(REGEX REPLACE "((${anum})+)${spaces}*(([*]+))" "\\1 " passed "${passed}")
+        message(STATUS "DEBUG: ${passed}")
+        string(REGEX REPLACE "(${anum}|[*])+[${spaces}*]*(${anum}+)" "\\2" passed "${passed}")
         string(REGEX REPLACE "self" "self->obj" passed "${passed}")
 
         message(STATUS "Scanned: ${temname} ${temparam} ${temret} ${passed}")
         file(APPEND
                 "${out_file}"
-                "${temret} ${classname}_${temname} ${temparam}"
+                "static ${temret} ${classname}_${temname} ${temparam}"
                 " {\n"
                 "   return self->pVft->${temname}${passed};\n"
                 "}\n\n"
