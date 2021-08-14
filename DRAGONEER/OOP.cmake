@@ -3,7 +3,7 @@ function(scanMethod inp out_name out_param out_ret)
     set(spaces "[ \\r\\t\\n]")
     set(anum "[A-Za-z0-9]")
 
-    string(REGEX MATCH "${anum}+" rettype "${temp}")
+    string(REGEX MATCH "(${anum}|[ *])+" rettype "${temp}")
 
     message(STATUS "Input: ${temp}")
     string(REGEX REPLACE "${anum}+${spaces}+DgnMethod${spaces}+" "" temp "${temp}")
@@ -12,6 +12,7 @@ function(scanMethod inp out_name out_param out_ret)
     message(STATUS "methname: ${methname}")
 
     string(REGEX REPLACE "\\(\\*[^\\)]*\\)" "" params "${temp}")
+    string(REGEX REPLACE ".*DgnMethod" "" params "${params}")
     message(STATUS "Params: ${params}")
 
     set(${out_name} "${methname}" PARENT_SCOPE)
@@ -38,18 +39,25 @@ function(ScanInterface classname)
     # Scan for methods
     set(spaces "[ \\r\\t\\n]")
     set(anum "[A-Za-z0-9]")
-    string(REGEX MATCHALL "${anum}+${spaces}+DgnMethod${spaces}+[^;]+;" matches "${txt}")
+    string(REGEX MATCHALL "(${anum}|[*])+${spaces}*DgnMethod${spaces}+[^;]+;" matches "${txt}")
 
 
     # Write implementation helper
     file(WRITE
             "${out_file}"
-            "// Generated class ${classname}\n\n"
+            "// Generated class ${classname}\n"
+            "struct ${classname}_Vft;\n\n"
+            "typedef struct ${classname}_Vft* ${classname}_VftPtr;\n\n"
             "typedef struct {\n"
-            "   ${classname}_Vft vft;\n"
+            "   ${classname}_VftPtr pVft;\n"
             "   void *obj;\n"
             "} ${classname};\n\n"
             "typedef ${classname}* ${classname}Ptr;\n\n"
+            )
+
+    file(APPEND
+            "${out_file}"
+            "struct ${classname}_Vft {\n"
             )
 
     foreach (f ${matches})
@@ -57,15 +65,35 @@ function(ScanInterface classname)
 
         string(REGEX REPLACE "^${spaces}*\\(" "(${classname}Ptr self," temparam "${temparam}")
         string(REGEX REPLACE "${anum}+[${spaces}*]*(${anum}+)" "\\1" passed "${temparam}")
+        string(REGEX REPLACE "self" "self->obj" passed "${passed}")
+
+        message(STATUS "Scanned: ${temname} ${temparam} ${temret} ${passed}")
+        file(APPEND
+                "${out_file}"
+                "   ${temret} (*${temname}) ${temparam};\n"
+                )
+    endforeach ()
+
+    file(APPEND
+            "${out_file}"
+            "};\n\n"
+            )
+
+    # Functions to call method
+    foreach (f ${matches})
+        scanMethod("${f}" temname temparam temret)
+
+        string(REGEX REPLACE "^${spaces}*\\(" "(${classname}Ptr self," temparam "${temparam}")
+        string(REGEX REPLACE "${anum}+[${spaces}*]*(${anum}+)" "\\1" passed "${temparam}")
+        string(REGEX REPLACE "self" "self->obj" passed "${passed}")
 
         message(STATUS "Scanned: ${temname} ${temparam} ${temret} ${passed}")
         file(APPEND
                 "${out_file}"
                 "${temret} ${classname}_${temname} ${temparam}"
                 " {\n"
-                "   self->vft->${temname}${passed};\n"
+                "   return self->pVft->${temname}${passed};\n"
                 "}\n\n"
                 )
     endforeach ()
-
 endfunction()
