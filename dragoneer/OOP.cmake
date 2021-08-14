@@ -51,11 +51,39 @@ function(ScanInterface classname)
             "typedef struct ${classname}_Vft* ${classname}_VftPtr;\n\n"
             "typedef struct {\n"
             "   ${classname}_VftPtr pVft;\n"
-            "   void *obj;\n"
+            "   TVoidPtr obj;\n"
             "} ${classname};\n\n"
             "typedef ${classname}* ${classname}Ptr;\n\n"
             )
 
+
+    # Impl
+
+    file(APPEND
+            "${out_file}"
+            "#define Implement_${classname}(c) { \\\n"
+            )
+
+    foreach (f ${matches})
+        scanMethod("${f}" temname temparam temret)
+
+        string(REGEX REPLACE "^${spaces}*\\(" "(TVoidPtr self," temparam "${temparam}")
+        string(REGEX REPLACE "${anum}+[${spaces}*]*(${anum}+)" "\\1" passed "${temparam}")
+        string(REGEX REPLACE "self" "self->obj" passed "${passed}")
+
+        message(STATUS "Scanned: ${temname} ${temparam} ${temret} ${passed}")
+        file(APPEND
+                "${out_file}"
+                "   .${temname} = c##_${temname} ,\\\n"
+                )
+    endforeach ()
+    file(APPEND
+            "${out_file}"
+            "    }\\\n"
+            "\n"
+            )
+
+    # Virtual Function Table
     file(APPEND
             "${out_file}"
             "struct ${classname}_Vft {\n"
@@ -64,7 +92,7 @@ function(ScanInterface classname)
     foreach (f ${matches})
         scanMethod("${f}" temname temparam temret)
 
-        string(REGEX REPLACE "^${spaces}*\\(" "(${classname}Ptr self," temparam "${temparam}")
+        string(REGEX REPLACE "^${spaces}*\\(" "(TVoidPtr self," temparam "${temparam}")
         string(REGEX REPLACE "${anum}+[${spaces}*]*(${anum}+)" "\\1" passed "${temparam}")
         string(REGEX REPLACE "self" "self->obj" passed "${passed}")
 

@@ -15,9 +15,8 @@ typedef uint16_t  TUint16;
 typedef uint8_t   TUint8;
 typedef bool      TBool;
 
-static const TBool c_true  = 1 == 1;
-static const TBool c_false = 1 == 0;
+typedef void *TVoidPtr;
 
-typedef const uint8_t* TCStrPtr;
+typedef const uint8_t *TCStrPtr;
 
 #endif //DRAGONEER_UTILS_H

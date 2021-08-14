@@ -46,3 +46,7 @@ target_compile_definitions(
 include(OOP.cmake)
 
 ScanInterface(IList)
+
+# Examples
+
+add_subdirectory("EXAMPLES")
