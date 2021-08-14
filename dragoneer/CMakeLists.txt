@@ -44,12 +44,12 @@ target_compile_definitions(
         DgnInherit=//
 )
 
-# OOP
+# Object-oriented Programming
 
 include(OOP.cmake)
 
 ScanInterface(IList)
 
-# Examples
+# Add examples
 
 add_subdirectory("examples")
