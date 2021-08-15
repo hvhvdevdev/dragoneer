@@ -8,8 +8,7 @@ jobs:
       - run: ls -laR
       - run: mkdir _build
       - run: cd _build
-          | CC=/usr/bin/clang CXX=/usr/bin/clang++ cmake ../dragoneer --target example-list-usage
-          | CC=/usr/bin/clang CXX=/usr/bin/clang++ cmake ../dragoneer --target example-animal-oop
-      - run: cmake --build _build
+          | CC=/usr/bin/clang CXX=/usr/bin/clang++ cmake ../dragoneer
+      - run: cmake --build _build --target example-list-usage example-animal-oop
       - run: ls -lRa
 
