@@ -62,6 +62,7 @@ endforeach ()
 
 add_library(
         ${DRAGONEER_LIBRARY_NAME}
+        INTERFACE
         Dummy.c
         IElemList.h
         Utils.h
@@ -77,13 +78,13 @@ set_target_properties(${DRAGONEER_LIBRARY_NAME} PROPERTIES C_STANDARD_REQUIRED T
 
 target_include_directories(
         ${DRAGONEER_LIBRARY_NAME}
-        PUBLIC
+        INTERFACE
         ${CMAKE_CURRENT_BINARY_DIR}/${DRAGONEER_LIBRARY_NAME}/
 )
 
 target_compile_definitions(
         ${DRAGONEER_LIBRARY_NAME}
-        PUBLIC
+        INTERFACE
         DgnMethod=
         DgnInherit=//
 )
@@ -92,7 +93,7 @@ target_compile_definitions(
 
 include(OOP.cmake)
 
-EnableGeneric(${DRAGONEER_LIBRARY_NAME} TInt32 TFloat Elem)
+# EnableGeneric(${DRAGONEER_LIBRARY_NAME} TInt32 TFloat Elem)
 
 # Add examples
 
