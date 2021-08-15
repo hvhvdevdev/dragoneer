@@ -6,5 +6,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: ls -laR
+      - run: mkdir _build
+      - run: export CC=clang
       - run: cmake --build _build
 
