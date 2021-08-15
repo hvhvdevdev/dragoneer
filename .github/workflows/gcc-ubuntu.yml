@@ -1,0 +1,12 @@
+name: Clang on Ubuntu
+on: [ push,pull_request ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: ls -laR
+      - run: mkdir _build
+      - run: cd _build && CC=gcc CXX=g++ cmake ../dragoneer
+      - run: cmake --build _build --target example-list-usage example-animal-oop
+      - run: ls -lRa
