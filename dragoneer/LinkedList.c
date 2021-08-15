@@ -1,5 +1,3 @@
-typedef float Elem; // fix IDE Problems
-
 #include <Utils.h>
 #include "LinkedList.h"
 
