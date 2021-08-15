@@ -1,0 +1,10 @@
+name: Clang tests
+on: [ push,pull_request ]
+jobs:
+  build:
+    runs-on: ubuntu-16.04
+    steps:
+      - uses: actions/checkout@v2
+      - run: ls -laR
+      - run: cmake --build _build
+
