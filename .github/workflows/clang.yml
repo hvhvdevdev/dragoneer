@@ -9,4 +9,5 @@ jobs:
       - run: mkdir _build
       - run: export CC=clang
       - run: cmake --build _build
+      - run: ls -lRa
 
