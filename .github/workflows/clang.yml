@@ -8,6 +8,6 @@ jobs:
       - run: ls -laR
       - run: mkdir _build
       - run: export CC=clang
-      - run: cmake --build _build
+      - run: cd _build && cmake ../dragoneer
       - run: ls -lRa
 
