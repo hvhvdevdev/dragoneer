@@ -7,7 +7,7 @@ jobs:
       - uses: actions/checkout@v2
       - run: ls -laR
       - run: mkdir _build
-      - run: export CC=clang
-      - run: cd _build && cmake ../dragoneer
+      - run: cd _build && CC=/usr/bin/clang CXX=/usr/bin/clang++ cmake ../dragoneer
+      - run: cmake --build _build
       - run: ls -lRa
 
