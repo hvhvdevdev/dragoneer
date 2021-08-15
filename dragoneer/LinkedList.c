@@ -1,6 +1,7 @@
-#include "LinkedList.h"
-
 typedef float Elem; // fix IDE Problems
+
+#include <Utils.h>
+#include "LinkedList.h"
 
 Implement_IElemList( ElemLinkedList );
 
