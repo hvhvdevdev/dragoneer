@@ -4,7 +4,7 @@ jobs:
   build:
     runs-on: windows-latest
     steps:
-      - uses: action/checkoutv2
+      - uses: action/checkout@v2
       - run: tree
       - run: mkdir _build
       - run: cd _build && cmake ../dragoneer
