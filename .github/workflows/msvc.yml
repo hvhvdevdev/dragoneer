@@ -1,0 +1,13 @@
+name: MSVC on Windows
+on: [ push, pull_request ]
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: action/checkoutv2
+      - run: tree
+      - run: mkdir _build
+      - run: cd _build && cmake ../dragoneer
+      - run: tree
+      - run: cmake --build _build
+      - run: tree
