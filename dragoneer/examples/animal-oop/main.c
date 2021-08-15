@@ -2,7 +2,7 @@
 #include <ImplIAnimal.h>
 #include <ImplIMammal.h>
 #include <stdio.h>
-#include <malloc.h>
+#include <stdlib.h>
 
 struct CDog {
     // Member data
