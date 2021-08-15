@@ -1,4 +1,4 @@
-name: Clang on Ubuntu
+name: GCC on Ubuntu
 on: [ push,pull_request ]
 jobs:
   build:
